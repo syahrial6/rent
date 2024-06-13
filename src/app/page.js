@@ -1,117 +1,38 @@
-"use client"
-import { useState } from "react";
-import axios from "axios";
-import Image from "next/image";
-import swal from 'sweetalert'
+import Link from 'next/link';
+import Image from 'next/image';
 
-
-export default function Home() {
-  const [formData, setFormData] = useState({
-    tanggal: '',
-    nama_layanan: '',
-    mobil: '',
-    nama_driver: '',
-    keterangan: '',
-  });
-  const [status, setStatus] = useState('');
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwWyygUupIKE-QfRXBaxtnSIiahPh2A2shIi8xnLrixeJpbgDLUEmSWWeLY2ijKYuxq/exec';
-
-    try {
-      const formDataObj = new FormData();
-      Object.keys(formData).forEach(key => formDataObj.append(key, formData[key]));
-
-      const response = await axios.post(scriptURL, formDataObj);
-
-      if (response.status === 200) {
-        setStatus('Success!');
-        console.log('Success!', response);
-        swal("Good job!", "Data Telah Disimpan", "success");
-      } else {
-        setStatus('Error!');
-        console.error('Error!', response.statusText);
-        swal("Error!", `${response.statusText}`, "error");
-      }
-    } catch (error) {
-      setStatus('Error!');
-      console.error('Error!', error.message);
-    }
-  };
+const Home = () => {
+  const cars = [
+    { id: 1, name: 'Fortuner', price: '1500000', image: '/image/fortuner.jpg', path: '/fortuner'},
+    { id: 2, name: 'Hilux ', price: '1500000', image: '/image/hilux.jpg', path: '/hilux' },
+    { id: 3, name: 'INNOVA REBORN', price: '500000', image: '/image/innova.jpg', path: '/innova' },
+    { id: 4, name: 'AVANZA FACELIFT', price: '300000', image: '/image/facelift.jpg', path: '/facelift' },
+    { id: 5, name: 'NEW AVANZA', price: '350000', image: '/image/newavanza.jpg', path: '/newavanza' },
+    { id: 6, name: 'NEW VELOZ', price: '350000', image: '/image/veloz.jpg', path: '/veloz'},
+    { id: 7, name: 'ALL NEW LIVINA', price: '350000', image: '/image/livina.jpg', path: '/livina'},
+    // Tambahkan data mobil lainnya di sini
+  ];
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
-    <h2 className="text-2xl font-bold mb-4">Form Penggunaan Mobil</h2>
-    <Image
-      src="/image/images.jpg"
-      width={500}
-      height={500}
-      alt="Picture of the author"
-    />
-    <form onSubmit={handleSubmit}>
-      <div className="mb-4">
-        <label className="block text-gray-700">Tanggal</label>
-        <input
-          type="date"
-          name="tanggal"
-          value={formData.tanggal}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        />
+    <div className="container mx-auto px-4">
+      <h1 className="text-2xl font-bold mb-4">Pilih Mobil</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {cars.map(car => (
+          <div key={car.id} className="max-w-sm rounded overflow-hidden shadow-lg">
+            <Image className="w-full" width={"300"} height={"200"} src={car.image} alt={car.name} />
+            <div className="px-6 py-4">
+              <div className="font-bold text-xl mb-2">{car.name}</div>
+              <p className="text-gray-700 text-base">Rp. {parseInt(car.price).toLocaleString()}</p>
+             
+                <Link href={car.path} className="inline-block mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  Isi Form
+                </Link>
+            
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">Nama Layanan</label>
-        <input
-          type="text"
-          name="nama_layanan"
-          value={formData.namaLayanan}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">Mobil</label>
-        <input
-          type="text"
-          name="mobil"
-          value={"KB 1392 DY"}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">Nama Driver</label>
-        <input
-          type="text"
-          name="nama_driver"
-          value={formData.namaDriver}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">Keterangan</label>
-        <textarea
-          name="keterangan"
-          value={formData.keterangan}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        />
-      </div>
-      <div className="mb-4">
-        <button
-          type="submit"
-          className="w-full bg-indigo-500 text-white rounded-md py-2 px-4 hover:bg-indigo-600"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
-  </div>
+    </div>
   );
-}
+};
+
+export default Home;
