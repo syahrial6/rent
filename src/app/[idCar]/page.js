@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import axios from "axios";
 import Image from "next/image";
 import swal from "sweetalert";
@@ -31,11 +31,21 @@ export default function Fortuner({ params }) {
     durasi: "",
     tujuan: "",
     harga: "",
+    tujuanAntar: "",
     timAntar: "",
   });
   console.log(formData);
+  useEffect(() => {
+    // Kalkulasi harga berdasarkan durasi
+    if (formData.durasi) {
+      setFormData(prevFormData => ({
+        ...prevFormData,
+        harga: harga * formData.durasi
+      }));
+    }
+  }, [formData.durasi]);
  
-  const [status, setStatus] = useState("");
+  const [loading,setLoading] = useState(false);
   const varianMobil = [
     {
       mobil: "Fortuner GR - 1880 DJ",
@@ -110,6 +120,7 @@ export default function Fortuner({ params }) {
       "https://script.google.com/macros/s/AKfycbwWyygUupIKE-QfRXBaxtnSIiahPh2A2shIi8xnLrixeJpbgDLUEmSWWeLY2ijKYuxq/exec";
 
     try {
+      setLoading(true);
       const formDataObj = new FormData();
       Object.keys(formData).forEach((key) =>
         formDataObj.append(key, formData[key])
@@ -118,21 +129,24 @@ export default function Fortuner({ params }) {
       const response = await axios.post(scriptURL, formDataObj);
 
       if (response.status === 200) {
-        setStatus("Success!");
+       
         console.log("Success!", response);
         swal("Good job!", "Data Telah Disimpan", "success");
       } else {
-        setStatus("Error!");
+      
         console.error("Error!", response.statusText);
         swal("Error!", `${response.statusText}`, "error");
       }
+      setLoading(false);
     } catch (error) {
-      setStatus("Error!");
+      
       console.error("Error!", error.message);
+      setLoading(false);
     }
   };
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+     
       <h2 className="text-2xl font-bold mb-4">Form Penggunaan Mobil</h2>
       <Image
         src={`/image/${params.idCar}.jpg`}
@@ -146,8 +160,8 @@ export default function Fortuner({ params }) {
           <input
           required={true}
             type="datetime-local"
-            name="tanggalKeluar"
-            value={formData.tanggalKeluar}
+            name="waktuKeluar"
+            value={formData.waktuKeluarKeluar}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
@@ -192,11 +206,21 @@ export default function Fortuner({ params }) {
         </div>
         <div className="mb-4">
           <label className="block text-gray-700">Opsi</label>
+          <select name="opsi" value={formData.opsi}
+          onChange={handleChange} required={true} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"> 
+            <option value="">Pilih Opsi</option>
+            <option value="Kaki">Kaki</option>
+            <option value="Konsumen">Konsumen</option>
+          </select>
+         
+          
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700">Durasi</label>
           <input
            required={true}
-            type="text"
-            name="opsi"
-            value={formData.opsi}
+            name="durasi"
+            value={formData.durasi}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
@@ -211,32 +235,27 @@ export default function Fortuner({ params }) {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </div>
+      
         <div className="mb-4">
-          <label className="block text-gray-700">Durasi</label>
+          <label className="block text-gray-700">Tujuan Antar</label>
           <input
            required={true}
-            name="durasi"
-            value={formData.durasi}
+            name="tujuanAntar"
+            value={formData.tujuanAntar}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </div>
         <label className="block text-gray-700">Harga</label>
-        <input
-         required={true}
-          value={harga*formData.durasi}
-          onChange={handleChange}
-          type="text"
-          name="harga"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        />
+        <label className="block text-gray-700" name="harga" onChange={handleChange}>{harga*formData.durasi}</label>
 
         <div className="mb-4">
           <button
             type="submit"
             className="w-full bg-indigo-500 text-white rounded-md py-2 px-4 hover:bg-indigo-600"
           >
-            Submit
+            {loading === true ? "Loading..." :  "Submit"}
+           
           </button>
         </div>
       </form>
