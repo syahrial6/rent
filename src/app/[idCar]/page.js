@@ -252,7 +252,7 @@ export default function Fortuner({ params }) {
         <div className="mb-4">
           <button
             type="submit"
-            className="w-full bg-indigo-500 text-white rounded-md py-2 px-4 hover:bg-indigo-600"
+            className="w-full bg-black text-white rounded-md py-2 px-4 hover:bg-indigo-600"
           >
             {loading === true ? "Loading..." :  "Submit"}
            
